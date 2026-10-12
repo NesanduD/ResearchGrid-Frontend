@@ -34,6 +34,25 @@ function Dashboard() {
     }
   };
 
+  const deleteProject = async (projectId) => {
+    if (!window.confirm("Are you sure you want to delete this project?")) return;
+    
+    try {
+      const response = await fetch(`http://localhost:8080/api/projects/${projectId}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        // Remove the project from the React state immediately without reloading the page
+        setProjects(projects.filter(p => p.id !== projectId));
+      } else {
+        alert("Failed to delete project.");
+      }
+    } catch (error) {
+      console.error("Error deleting project:", error);
+    }
+  };
+
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-500 font-medium text-lg bg-gray-50">Loading enterprise data...</div>;
 
   return (
@@ -49,14 +68,28 @@ function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map(project => (
             <div key={project.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-all hover:shadow-lg flex flex-col">
+              
+              {/* UPDATED HEADER WITH DELETE BUTTON */}
               <div className="flex justify-between items-start mb-4">
-                <h2 className="text-xl font-bold text-gray-800 leading-tight">{project.title}</h2>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                  project.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                }`}>
-                  {project.status || 'Active'}
-                </span>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-800 leading-tight">{project.title}</h2>
+                  <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                    project.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                  }`}>
+                    {project.status || 'Active'}
+                  </span>
+                </div>
+                <button 
+                  onClick={() => deleteProject(project.id)}
+                  className="text-gray-400 hover:text-red-600 transition-colors cursor-pointer p-1"
+                  title="Delete Project"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
               </div>
+              {/* END UPDATED HEADER */}
               
               <div className="text-sm text-gray-600 mb-6 flex-grow">
                 <p><span className="font-semibold text-gray-700">Research Area:</span> {project.researchArea}</p>

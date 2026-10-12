@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
+import CreateProject from './pages/CreateProject';
 
 // We will build these two pages next!
-const CreateProject = () => <div className="p-10 text-center text-xl">Create Project Form Coming Next...</div>;
 const Login = () => <div className="p-10 text-center text-xl">Role-Based Login Coming Soon...</div>;
 
 function App() {
