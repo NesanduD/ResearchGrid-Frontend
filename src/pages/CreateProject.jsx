@@ -1,8 +1,19 @@
 import { useState } from 'react'; // To manage form input state and submission state
 import { useNavigate } from 'react-router-dom'; // to automatically redirect the user after successful submission
+import { useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 function CreateProject() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user?.role !== 'ADMIN') {
+      alert("Access Denied: Only Admins can create projects.");
+      navigate('/');
+    }
+  }, [user, navigate]);
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: '',

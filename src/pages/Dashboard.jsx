@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function Dashboard() {
+  const { user } = useAuth(); // Pull the current user and role from Context
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(null);
@@ -43,7 +45,6 @@ function Dashboard() {
       });
       
       if (response.ok) {
-        // Remove the project from the React state immediately without reloading the page
         setProjects(projects.filter(p => p.id !== projectId));
       } else {
         alert("Failed to delete project.");
@@ -60,16 +61,19 @@ function Dashboard() {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">ResearchGrid Dashboard</h1>
-          <Link to="/create" className="bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg transition-colors shadow-sm">
-            + New Project
-          </Link>
+          
+          {/* SECURED: Only show New Project button if user is an ADMIN */}
+          {user?.role === 'ADMIN' && (
+            <Link to="/create" className="bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg transition-colors shadow-sm">
+              + New Project
+            </Link>
+          )}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map(project => (
             <div key={project.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-all hover:shadow-lg flex flex-col">
               
-              {/* UPDATED HEADER WITH DELETE BUTTON */}
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h2 className="text-xl font-bold text-gray-800 leading-tight">{project.title}</h2>
@@ -79,17 +83,20 @@ function Dashboard() {
                     {project.status || 'Active'}
                   </span>
                 </div>
-                <button 
-                  onClick={() => deleteProject(project.id)}
-                  className="text-gray-400 hover:text-red-600 transition-colors cursor-pointer p-1"
-                  title="Delete Project"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+                
+                {/* SECURED: Only show Delete button if user is an ADMIN */}
+                {user?.role === 'ADMIN' && (
+                  <button 
+                    onClick={() => deleteProject(project.id)}
+                    className="text-gray-400 hover:text-red-600 transition-colors cursor-pointer p-1"
+                    title="Delete Project"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                )}
               </div>
-              {/* END UPDATED HEADER */}
               
               <div className="text-sm text-gray-600 mb-6 flex-grow">
                 <p><span className="font-semibold text-gray-700">Research Area:</span> {project.researchArea}</p>
